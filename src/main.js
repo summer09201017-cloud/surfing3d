@@ -87,6 +87,10 @@ game.onEvent = (event) => {
       pushCommentary("最後十秒——拼一波大招!", "hot");
       break;
     case "run-end":
+      try { if (!['localhost','127.0.0.1'].includes(location.hostname)) {   // -done:玩完一局(t=本局秒數,/stats 使用次數與平均停留吃這個)
+        var __dt = Math.round((Date.now() - (window.__matchT0 || Date.now())) / 1000);
+        navigator.sendBeacon?.('https://hfpc-play-stats.summer09201017.workers.dev/api/ping?g=surfing3d-done&t=' + __dt);
+      } } catch (_) {}
       audio.horn(); audio.cheer(); audio.crowdCheer(1); audio.stopCrowd();
       speakLine("時間到!看看總分!");
       ui.matchOverlay.classList.add("visible");
@@ -189,7 +193,7 @@ function beginRun() {
   ui.controlsPanel.hidden = false;
   game.start();
 }
-ui.startButton.addEventListener("click", beginRun);
+ui.startButton.addEventListener("click", () => { window.__matchT0 = Date.now(); beginRun(); });   // -done beacon 用:本局開始時間
 ui.overlayReplayButton.addEventListener("click", () => { audio.uiTap(); ui.matchOverlay.classList.remove("visible"); beginRun(); });
 ui.overlayMenuButton.addEventListener("click", () => {
   audio.uiTap();
